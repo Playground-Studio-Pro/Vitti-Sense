@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Urbanist", sans-serif;
+  --color-primary-green: #26D07C;
+  --color-chart-blue: #7183F5;
+  --color-text-black: #242424;
+}
+
+html {
+  /* 
+    Base font size scales with viewport. 
+    16px minimum, scaling up to ~24px on large screens.
+    On a 75" 4K screen (3840px wide), 1.5vmin is ~32px, making everything 2x larger.
+  */
+  font-size: clamp(16px, 1.5vmin, 32px);
+}
+
+body {
+  background-color: #FCFCFC;
+  color: var(--color-text-black);
+  font-family: var(--font-sans);
+  overflow: hidden; /* Kiosk mode usually prevents scrolling */
+  line-height: 1.5;
+}
+
+/* Background Glow Animation */
+.nb-bg {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  background: #fcfcfc;
+}
+
+.nb-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  will-change: transform;
+}
+
+.nb-blob-1 {
+  width: 420px;
+  height: 420px;
+  background: rgba(113, 131, 245, 0.15);
+  top: 8%;
+  left: 12%;
+  animation: drift1 14s ease-in-out infinite alternate;
+}
+
+.nb-blob-2 {
+  width: 500px;
+  height: 500px;
+  background: rgba(38, 208, 124, 0.1);
+  bottom: 6%;
+  right: 10%;
+  animation: drift2 17s ease-in-out infinite alternate;
+}
+
+.nb-blob-3 {
+  width: 340px;
+  height: 340px;
+  background: rgba(113, 131, 245, 0.1);
+  bottom: 24%;
+  left: 42%;
+  animation: drift3 20s ease-in-out infinite alternate;
+}
+
+@keyframes drift1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(100px, 60px, 0) scale(1.15);
+  }
+}
+
+@keyframes drift2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(-120px, -50px, 0) scale(1.1);
+  }
+}
+
+@keyframes drift3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(60px, -80px, 0) scale(1.15);
+  }
+}

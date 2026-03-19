@@ -1,0 +1,204 @@
+/*
+ * ═══════════════════════════════════════════════════════════════════
+ *  PORTRAIT KIOSK MODE — CSS
+ * ═══════════════════════════════════════════════════════════════════
+ *
+ *  Architecture (visualised):
+ *
+ *  ┌─────────────────────────── 1920 px ───────────────────────────┐
+ *  │  .portrait-kiosk-viewport  (landscape monitor, 1920 × 1080)  │
+ *  │                                                               │
+ *  │   ┌───────── 1080 px ──────────┐                              │
+ *  │   │                            │  .portrait-kiosk-stage       │
+ *  │   │   App content rendered     │  (portrait, 1080 × 1920)     │
+ *  │   │   in portrait layout       │  rotated -90° in place       │
+ *  │   │   (1080 wide × 1920 tall)  │                              │
+ *  │   │                            │                              │
+ *  │   └────────────────────────────┘                              │
+ *  │                                                               │
+ *  └───────────────────────────────────────────────────────────────┘
+ *
+ *  The key trick:
+ *    1. The stage is sized 1080 × 1920 (portrait).
+ *    2. We rotate it -90° (counter-clockwise) around its center.
+ *    3. After rotation, its visual footprint is 1920 × 1080 — 
+ *       exactly fitting the landscape monitor.
+ *    4. We translate it so it is perfectly centered in the viewport.
+ *    5. Because we never rotated the OS display, touch coordinates
+ *       pass through identically — no axis inversion.
+ *
+ *  HOW TO DISABLE:
+ *    Simply remove the `.portrait-kiosk-viewport` wrapper from the
+ *    React tree (see PortraitKioskWrapper.tsx) or set the config
+ *    flag to false. All these styles are scoped and inert unless
+ *    the wrapper class is present.
+ * ═══════════════════════════════════════════════════════════════════
+ */
+
+/* ── Outer viewport: fills the physical landscape screen ────────── */
+.portrait-kiosk-viewport {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;          /* physical landscape width  = 1920 */
+  height: 100vh;         /* physical landscape height = 1080 */
+  overflow: hidden;      /* nothing leaks outside the monitor */
+  background: #FCFCFC;   /* match app background */
+  z-index: 0;
+}
+
+/* ── Inner stage: the portrait canvas, rotated into landscape ──── */
+.portrait-kiosk-stage {
+  /*
+   * Dimensions are portrait: 1080 wide × 1920 tall.
+   * But we need to express them in a way that works reliably
+   * regardless of slight viewport rounding differences.
+   *
+   * width  = viewport HEIGHT  (the short side → 100vh)
+   * height = viewport WIDTH   (the long side  → 100vw)
+   */
+  width: 100vh;          /* 1080 on a 1920×1080 monitor */
+  height: 100vw;         /* 1920 on a 1920×1080 monitor */
+
+  /*
+   * Position at the center of the viewport BEFORE rotation,
+   * then rotate -90° around the center point.
+   *
+   * After rotation the visual bounding box becomes 100vw × 100vh
+   * which perfectly fills the landscape monitor.
+   */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  transform-origin: center center;
+
+  /* The app's own content will scroll/overflow inside this box */
+  overflow: hidden;
+
+  /* Ensure pointer-events flow through normally */
+  pointer-events: auto;
+}
+
+/*
+ * Override the base html font-size calculation for portrait mode.
+ * The original uses `clamp(16px, 1.5vmin, 32px)` which is tuned
+ * for landscape. In portrait-kiosk mode the effective short axis
+ * is 100vh (1080px), so vmin already resolves to vh — but we
+ * recalculate based on the *rotated* portrait dimensions to keep
+ * content sizing proportional.
+ */
+.portrait-kiosk-viewport html,
+.portrait-kiosk-stage {
+  font-size: clamp(16px, 1.5vmin, 32px);
+}
+
+/* ── Status indicator (development aid) ─────────────────────────── */
+.portrait-kiosk-indicator {
+  display: none;
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  z-index: 99999;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: rgba(38, 208, 124, 0.15);
+  border: 1px solid rgba(38, 208, 124, 0.4);
+  color: #1a8a54;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: "Urbanist", system-ui, sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  pointer-events: none;       /* don't interfere with touches */
+  backdrop-filter: blur(6px);
+  user-select: none;
+  /* This indicator sits in the VIEWPORT (not the stage) so it
+     appears at the physical bottom-right of the landscape screen */
+}
+
+/* 
+ * ─── Ensure the app root inside the stage fills the portrait area ─
+ * The App component's outermost div uses h-screen / w-full.
+ * Inside the stage, "100%" refers to the stage dimensions
+ * (portrait 1080×1920), which is exactly what we want.
+ */
+.portrait-kiosk-stage > * {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ *  CURSOR MANAGEMENT — Portrait Kiosk Mode
+ * ═══════════════════════════════════════════════════════════════════
+ *
+ *  Problem: The native OS cursor stays in landscape orientation
+ *  while the UI is rotated -90°. It looks perpendicular and wrong.
+ *
+ *  Solution:
+ *    1. Hide the native cursor on the entire kiosk viewport.
+ *    2. Optionally render a custom in-app cursor that is rotated
+ *       to match the portrait UI direction.
+ *
+ *  These rules ONLY apply inside `.portrait-kiosk-viewport` —
+ *  zero effect on the app in normal (non-kiosk) mode.
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Hide native cursor in portrait kiosk mode ──────────────────── */
+.portrait-kiosk-viewport,
+.portrait-kiosk-viewport *,
+.portrait-kiosk-viewport *::before,
+.portrait-kiosk-viewport *::after {
+  cursor: none !important;
+}
+
+/* ── Custom cursor element (rendered by PortraitKioskCursor) ────── */
+.portrait-kiosk-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999999;           /* above everything including indicator */
+  pointer-events: none;      /* CRITICAL: don't capture any events */
+  will-change: transform;    /* GPU-accelerated for smooth tracking */
+
+  /* Start offscreen until first pointermove fires */
+  transform: translate(-100px, -100px);
+}
+
+/* The visible cursor graphic — a dot with a ring */
+.portrait-kiosk-cursor-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(38, 208, 124, 0.35);
+  border: 2px solid rgba(38, 208, 124, 0.7);
+  box-shadow:
+    0 0 8px rgba(38, 208, 124, 0.25),
+    0 0 20px rgba(38, 208, 124, 0.1);
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+/* Pressed state — shrink and brighten */
+.portrait-kiosk-cursor.is-pressed .portrait-kiosk-cursor-dot {
+  transform: scale(0.7);
+  background: rgba(38, 208, 124, 0.6);
+  border-color: rgba(38, 208, 124, 0.9);
+}
+
+/* Outer ring — gentle pulse */
+.portrait-kiosk-cursor-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(38, 208, 124, 0.2);
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.portrait-kiosk-cursor.is-pressed .portrait-kiosk-cursor-ring {
+  transform: translate(-50%, -50%) scale(0.6);
+  opacity: 0.5;
+}
