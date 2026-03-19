@@ -1,8 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 
 // Cell shape functions that return JSX instead of SVG strings
+// Pick a random color from the array
+const randColor = (colors: string[]) => colors[Math.floor(Math.random() * colors.length)];
+
 const Cell1 = ({ colors }: { colors: string[]; strokeWidth: number }) => (
-  <circle cx="50" cy="50" r="9.44" fill={colors[0]} fillRule="evenodd" />
+  <circle cx="50" cy="50" r="9.44" fill={randColor(colors)} fillRule="evenodd" />
 );
 
 const Cell2 = ({
@@ -18,7 +21,7 @@ const Cell2 = ({
       x2="75"
       y1="25"
       y2="25"
-      stroke={colors[0]}
+      stroke={randColor(colors)}
       strokeWidth={strokeWidth}
     />
     <line
@@ -26,7 +29,7 @@ const Cell2 = ({
       x2="75"
       y1="50"
       y2="50"
-      stroke={colors[0]}
+      stroke={randColor(colors)}
       strokeWidth={strokeWidth}
     />
     <line
@@ -34,7 +37,7 @@ const Cell2 = ({
       x2="75"
       y1="75"
       y2="75"
-      stroke={colors[0]}
+      stroke={randColor(colors)}
       strokeWidth={strokeWidth}
     />
   </>
@@ -53,7 +56,7 @@ const Cell3 = ({
       x2="75"
       y1="25"
       y2="75"
-      stroke={colors[0]}
+      stroke={randColor(colors)}
       strokeWidth={strokeWidth}
     />
     <line
@@ -61,7 +64,7 @@ const Cell3 = ({
       x2="75"
       y1="75"
       y2="25"
-      stroke={colors[0]}
+      stroke={randColor(colors)}
       strokeWidth={strokeWidth}
     />
   </>
@@ -80,7 +83,7 @@ const Cell4 = ({
     x="25"
     y="25"
     fill="none"
-    stroke={colors[0]}
+    stroke={randColor(colors)}
     strokeWidth={strokeWidth}
   />
 );
@@ -98,7 +101,7 @@ const Cell5 = ({
     y1="75"
     y2="25"
     fill="none"
-    stroke={colors[0]}
+    stroke={randColor(colors)}
     strokeWidth={strokeWidth}
   />
 );

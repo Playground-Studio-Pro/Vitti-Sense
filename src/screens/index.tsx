@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { QRCodeSVG } from 'qrcode.react';
 import {
   Language,
   Role,
@@ -8,7 +7,6 @@ import {
   UI_STRINGS,
   ROLES,
   SCENARIOS,
-  QR_URL
 } from '../data/content';
 import { AppState, Action } from '../hooks/useFSM';
 import { Chart } from '../components/Chart';
@@ -60,7 +58,21 @@ export const S0_Idle: React.FC<ScreenProps> = ({ dispatch, language }) => {
 import { KioskButton } from '../components/KioskButton';
 
 // --- S1: HOOK ---
+const BRAND_COLORS = ['#26D07C', '#7183F5'] as const;
+
 export const S1_Hook: React.FC<ScreenProps> = ({ dispatch, language }) => {
+  const [colorIndex, setColorIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setColorIndex(prev => (prev + 1) % 2);
+    }, 2200);
+    return () => clearInterval(interval);
+  }, []);
+
+  const bg1 = BRAND_COLORS[colorIndex];
+  const bg2 = BRAND_COLORS[(colorIndex + 1) % 2];
+
   return (
     <div className="h-full w-full flex flex-col items-center justify-center px-[5vw] text-center max-w-[90vw] mx-auto">
       <motion.div
@@ -69,20 +81,42 @@ export const S1_Hook: React.FC<ScreenProps> = ({ dispatch, language }) => {
         transition={{ duration: 0.5 }}
         className="flex flex-col gap-[6vh]"
       >
-        <h1 className="text-[7vmin] font-bold text-text-black leading-[1.1]">
-          {UI_STRINGS[language].hookTitle}
+        <h1 className="text-[7vmin] font-bold leading-[1.1]">
+          <motion.span
+            animate={{ color: bg1 }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
+          >
+            {UI_STRINGS[language].hookTitle.split(' ').slice(0, Math.ceil(UI_STRINGS[language].hookTitle.split(' ').length / 2)).join(' ')}
+          </motion.span>{' '}
+          <motion.span
+            animate={{ color: bg2 }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
+          >
+            {UI_STRINGS[language].hookTitle.split(' ').slice(Math.ceil(UI_STRINGS[language].hookTitle.split(' ').length / 2)).join(' ')}
+          </motion.span>
         </h1>
         <p className="text-[3.5vmin] text-gray-600 leading-relaxed max-w-[80%] mx-auto">
           {UI_STRINGS[language].hookSubtitle}
         </p>
         <div className="pt-[4vh]">
-          <KioskButton
-            onClick={() => dispatch({ type: 'ENTER_NEURAL_MODE' })}
-            className="px-[12vw] py-[3vh] rounded-full text-[3vmin] font-semibold flex items-center justify-center gap-4 mx-auto"
+          <motion.div
+            animate={{ backgroundColor: bg1 }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
+            className="rounded-full inline-block"
           >
-            {UI_STRINGS[language].startDemo}
-            <ArrowRight className="w-[3vmin] h-[3vmin]" />
-          </KioskButton>
+            <KioskButton
+              onClick={() => dispatch({ type: 'ENTER_NEURAL_MODE' })}
+              className="px-[12vw] py-[3vh] rounded-full text-[3vmin] font-semibold flex items-center justify-center gap-4 mx-auto !bg-transparent"
+            >
+              {UI_STRINGS[language].startDemo}
+              <motion.span
+                animate={{ color: bg2 }}
+                transition={{ duration: 1.2, ease: 'easeInOut' }}
+              >
+                <ArrowRight className="w-[3vmin] h-[3vmin]" />
+              </motion.span>
+            </KioskButton>
+          </motion.div>
         </div>
       </motion.div>
     </div>
@@ -367,77 +401,121 @@ export const S7_Result: React.FC<ScreenProps> = ({ dispatch, language, selectedS
   const { result } = selectedScenario;
 
   return (
-    <div className="h-full w-full flex flex-col px-[8vw] py-[3vh] overflow-hidden">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex-1 flex flex-col max-w-[84vw] mx-auto w-full h-full"
-      >
-        <h2 className="text-[2vmin] font-bold text-gray-400 uppercase tracking-widest mb-[2vh] text-center shrink-0">
-          {UI_STRINGS[language].results}
-        </h2>
+    <div className="h-full w-full flex flex-col px-[4vw] py-[2vh] overflow-hidden relative">
 
-        <div className="flex flex-col gap-[2vh] h-full overflow-y-auto overflow-x-hidden pb-[6vh] px-[2vw]">
-          {/* Insight Card */}
-          <div className="bg-white p-[3vh] rounded-3xl border-l-[1vmin] border-primary-green shadow-sm shrink-0 mt-[1vh]">
-            <h3 className="text-[3.5vmin] font-bold text-text-black leading-snug">
+      {/* Bottom SVG — structural background element, animated entrance */}
+      <motion.img
+        src="/Bottom.svg"
+        alt=""
+        aria-hidden="true"
+        initial={{ opacity: 0, y: 60 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.2, delay: 1.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 pointer-events-none select-none z-0"
+        style={{
+          width: '120vw',
+          maxWidth: 'none',
+        }}
+      />
+
+      {/* ── Content layer ── */}
+      <div className="flex-1 flex flex-col max-w-[94vw] mx-auto w-full h-full relative z-10">
+        <motion.h2
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+          className="text-[1.6vmin] font-bold text-gray-400 uppercase tracking-widest mb-[1.2vh] text-center shrink-0"
+        >
+          {UI_STRINGS[language].results}
+        </motion.h2>
+
+        <div className="flex flex-col gap-[1.2vh] h-full overflow-y-auto overflow-x-hidden pb-[2vh] px-[0.5vw]">
+          {/* 1. Insight Card — enters first */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="bg-white p-[2vh] rounded-3xl border-l-[0.8vmin] border-primary-green shadow-sm shrink-0 mt-[0.5vh]"
+          >
+            <h3 className="text-[3vmin] font-bold text-text-black leading-snug">
               {language === 'en' ? result.insightEn : result.insightEs}
             </h3>
-          </div>
+          </motion.div>
 
-          {/* Evidence List */}
-          <div className="bg-gray-50 p-[3vh] rounded-3xl shrink-0">
-            <h4 className="text-[2vmin] font-semibold text-gray-500 uppercase mb-[2vh] flex items-center gap-2">
+          {/* 2. Evidence List — enters second */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.55, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="bg-gray-50 p-[2vh] rounded-3xl shrink-0"
+          >
+            <h4 className="text-[1.6vmin] font-semibold text-gray-500 uppercase mb-[1vh] flex items-center gap-2">
               <FileText className="w-[2.5vmin] h-[2.5vmin]" /> Evidence
             </h4>
-            <ul className="space-y-[1.5vh]">
+            <ul className="space-y-[1vh]">
               {(language === 'en' ? result.evidenceEn : result.evidenceEs).map((item, i) => (
-                <li key={i} className="flex items-start gap-[2vw] text-gray-700 text-[2.5vmin]">
+                <li key={i} className="flex items-start gap-[2vw] text-gray-700 text-[2.2vmin]">
                   <Check className="w-[3vmin] h-[3vmin] text-primary-green shrink-0 mt-[0.5vh]" />
                   <span>{item}</span>
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
-          {/* Sources */}
-          <h4 className="text-[2vmin] font-semibold text-gray-500 uppercase mb-[2vh] mt-[2vh] flex items-center gap-2">
-            <Database className="w-[2.5vmin] h-[2.5vmin]" /> {UI_STRINGS[language].sourcesTitle}
-          </h4>
-          <div className="flex gap-[1vw] flex-wrap shrink-0">
-            {(language === 'en' ? result.sourcesEn : result.sourcesEs).map((source, i) => (
-              <span key={i} className="px-[2vw] py-[1vh] bg-blue-50 text-chart-blue text-[2vmin] font-medium rounded-full flex items-center gap-[1vw]">
-                <Database className="w-[2vmin] h-[2vmin]" /> {source}
-              </span>
-            ))}
-          </div>
+          {/* 3. Sources — enters third */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
+          >
+            <h4 className="text-[1.6vmin] font-semibold text-gray-500 uppercase mb-[1vh] mt-[1vh] flex items-center gap-2">
+              <Database className="w-[2.5vmin] h-[2.5vmin]" /> {UI_STRINGS[language].sourcesTitle}
+            </h4>
+            <div className="flex gap-[0.5vw] flex-wrap shrink-0">
+              {(language === 'en' ? result.sourcesEn : result.sourcesEs).map((source, i) => (
+                <span key={i} className="px-[1.2vw] py-[0.5vh] bg-blue-50 text-chart-blue text-[1.6vmin] font-medium rounded-full flex items-center gap-[0.5vw]">
+                  <Database className="w-[1.6vmin] h-[1.6vmin]" /> {source}
+                </span>
+              ))}
+            </div>
+          </motion.div>
 
-          {/* Chart */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-[2vh] flex flex-col justify-center min-h-[25vh] shrink-0 mt-[2vh]">
+          {/* 4. Chart — enters fourth */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="bg-white rounded-3xl border border-gray-100 shadow-sm p-[1.5vh] flex flex-col justify-center min-h-[18vh] shrink-0 mt-[1vh]"
+          >
             <Chart chartSpec={result.chartSpec} language={language} />
-            <p className="text-center text-gray-400 text-[1.5vmin] italic mt-[2vh]">
+            <p className="text-center text-gray-400 text-[1.2vmin] italic mt-[1vh]">
               {UI_STRINGS[language].demoDataDisclaimer}
             </p>
-          </div>
+          </motion.div>
 
-          {/* Actions */}
-          <div className="flex flex-col gap-[2vh] mt-auto pt-[2vh] shrink-0">
+          {/* 5. Actions — enters last */}
+          <motion.div
+            initial={{ opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.4, delay: 1.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="flex flex-col gap-[1vh] pt-[5vh] shrink-0"
+          >
             <KioskButton
               onClick={() => dispatch({ type: 'SHOW_QR' })}
-              className="w-full py-[3vh] rounded-2xl font-bold text-[3vmin]"
+              className="w-full py-[2.2vh] rounded-2xl font-bold text-[2.6vmin]"
             >
               {UI_STRINGS[language].scanToTake}
             </KioskButton>
             <KioskButton
               variant="secondary"
               onClick={() => dispatch({ type: 'BACK' })}
-              className="w-full py-[2.5vh] rounded-2xl font-medium text-[2.5vmin]"
+              className="w-full py-[2vh] rounded-2xl font-medium text-[2.2vmin]"
             >
               {UI_STRINGS[language].exploreAnother}
             </KioskButton>
-          </div>
+          </motion.div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -445,30 +523,30 @@ export const S7_Result: React.FC<ScreenProps> = ({ dispatch, language, selectedS
 // --- S8: QR ---
 export const S8_QR: React.FC<ScreenProps> = ({ dispatch, language }) => {
   return (
-    <div className="h-full w-full flex flex-col items-center justify-center px-8 text-center">
+    <div className="h-full w-full flex flex-col items-center justify-center px-[4vw] text-center">
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-white p-8 rounded-3xl shadow-2xl border border-gray-100 max-w-sm w-full"
+        className="bg-white p-[4vh] rounded-3xl shadow-2xl border border-gray-100 w-[60vw] max-w-[700px]"
       >
         <div className="mb-8">
-          <QRCodeSVG value={QR_URL} size={240} className="mx-auto" />
+          <img src="/Qr.png" alt="QR Code" className="mx-auto w-[360px] h-[360px] object-contain" />
         </div>
-        <p className="text-gray-600 mb-8 font-medium">
+        <p className="text-gray-600 mb-[3vh] font-medium text-[2.2vmin]">
           {UI_STRINGS[language].scanToTake}
         </p>
 
-        <div className="space-y-3">
+        <div className="space-y-[1.5vh]">
           <KioskButton
             onClick={() => dispatch({ type: 'FINISH_DEMO' })}
-            className="w-full py-3 rounded-xl font-bold"
+            className="w-full py-[2.5vh] rounded-xl font-bold text-[2.2vmin]"
           >
             {UI_STRINGS[language].scanButton}
           </KioskButton>
           <KioskButton
             variant="secondary"
             onClick={() => dispatch({ type: 'BACK' })}
-            className="w-full py-2 text-sm font-medium border-none shadow-none hover:bg-gray-50"
+            className="w-full py-[1.8vh] text-[1.8vmin] font-medium border-none shadow-none hover:bg-gray-50"
           >
             {UI_STRINGS[language].backToResults}
           </KioskButton>
