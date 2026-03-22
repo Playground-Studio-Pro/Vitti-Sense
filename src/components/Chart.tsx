@@ -289,14 +289,16 @@ function PieChartView({
   const size = Math.min(safeWidth, CHART_HEIGHT);
 
   return (
-    <div ref={ref} className="w-full" style={{ height: CHART_HEIGHT }}>
+    <div ref={ref} className="w-full flex items-center justify-center" style={{ height: CHART_HEIGHT }}>
       {ready && width > 0 && (
-        <PieChart width={size} height={CHART_HEIGHT}>
+        <PieChart width={size} height={size}>
           <Tooltip contentStyle={TOOLTIP_STYLE} />
           <Pie
             data={data}
             dataKey="value"
             nameKey="label"
+            cx="50%"
+            cy="50%"
             innerRadius="55%"
             outerRadius="80%"
             paddingAngle={2}

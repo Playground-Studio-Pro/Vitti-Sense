@@ -112,7 +112,7 @@ export const ThinkingScreen: React.FC<ThinkingScreenProps> = ({ lines, language,
   const phaseLabel = PHASE_LABELS[language][phase];
 
   return (
-    <div className="w-full h-full flex flex-col bg-white overflow-hidden relative">
+    <div className="w-full h-full flex flex-col bg-transparent overflow-hidden relative">
       {/* NetworkBlob — Dominant upper area */}
       <div className="flex-[6] min-h-0 w-full relative z-10 flex items-center justify-center">
         {/* Halo Gradient — Centered firmly behind the blob */}

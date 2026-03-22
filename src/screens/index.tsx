@@ -333,7 +333,7 @@ export const S5_Question: React.FC<ScreenProps> = ({ dispatch, language, selecte
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center px-8 max-w-[80vw] mx-auto">
-      <div className="w-full bg-white rounded-3xl shadow-xl border border-gray-100 p-[4vh] min-h-[30vh] flex flex-col">
+      <div className="w-full bg-white/95 backdrop-blur-md rounded-3xl border border-white shadow-[0_8px_60px_-8px_rgba(113,131,245,0.25),0_2px_24px_-4px_rgba(0,0,0,0.08)] ring-1 ring-white/80 p-[4vh] min-h-[30vh] flex flex-col relative z-10">
         <div className="flex items-center gap-3 mb-[3vh] border-b border-gray-100 pb-[2vh]">
           <div className="w-[1.5vh] h-[1.5vh] rounded-full bg-red-400" />
           <div className="w-[1.5vh] h-[1.5vh] rounded-full bg-yellow-400" />
@@ -530,7 +530,7 @@ export const S8_QR: React.FC<ScreenProps> = ({ dispatch, language }) => {
         className="bg-white p-[4vh] rounded-3xl shadow-2xl border border-gray-100 w-[60vw] max-w-[700px]"
       >
         <div className="mb-8">
-          <img src="/Qr.png" alt="QR Code" className="mx-auto w-[360px] h-[360px] object-contain" />
+          <img src="/Qr.jpeg" alt="QR Code" className="mx-auto w-[360px] h-[360px] object-contain" />
         </div>
         <p className="text-gray-600 mb-[3vh] font-medium text-[2.2vmin]">
           {UI_STRINGS[language].scanToTake}

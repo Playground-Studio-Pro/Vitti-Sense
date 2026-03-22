@@ -135,8 +135,8 @@ export default function App() {
   };
 
   return (
-    <div className="w-full h-screen bg-white text-text-black overflow-hidden relative font-sans selection:bg-primary-green/20">
-      {state.currentState === 'S0_IDLE' && <BackgroundGlow />}
+    <div className="w-full h-screen bg-transparent text-text-black overflow-hidden relative font-sans selection:bg-primary-green/20">
+      <BackgroundGlow currentState={state.currentState} />
 
       {/* --- CALIBRATION HUD --- */}
       {calibrationMode && (

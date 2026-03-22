@@ -207,15 +207,13 @@ const Blob: React.FC<NetworkBlobProps> = ({ phase }) => {
 export const NetworkBlob: React.FC<NetworkBlobProps> = ({ phase }) => {
   return (
     <div className="w-full h-full relative">
-      <Canvas camera={{ position: [0, 0, 22], fov: 45 }}>
-        <fog attach="fog" args={['#ffffff', 18, 28]} />
+      <Canvas camera={{ position: [0, 0, 22], fov: 45 }} style={{ background: 'transparent' }} gl={{ alpha: true }}>
         <ambientLight intensity={0.8} />
         <pointLight position={[10, 10, 10]} intensity={1} />
         <pointLight position={[-10, -10, -10]} intensity={0.5} />
         <Blob phase={phase} />
         <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.5} />
       </Canvas>
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-white/5" />
     </div>
   );
 };

@@ -24,8 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
   const showBack = currentState !== 'S9_DONE' && currentState !== 'S0_IDLE';
 
   return (
-    <header className={`absolute top-0 left-0 right-0 h-[clamp(80px,8vh,120px)] px-[clamp(32px,4vw,64px)] flex items-center justify-between z-50 transition-colors duration-300 ${currentState === 'S0_IDLE' ? 'bg-transparent' : 'bg-white/90 backdrop-blur-sm'
-      }`}>
+    <header className="absolute top-0 left-0 right-0 h-[clamp(80px,8vh,120px)] px-[clamp(32px,4vw,64px)] flex items-center justify-between z-50 bg-transparent">
       <div className="w-[clamp(120px,20vw,240px)] flex justify-start">
         {showBack && (
           <button

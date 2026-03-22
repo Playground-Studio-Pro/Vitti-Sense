@@ -16,6 +16,13 @@ html {
   font-size: clamp(16px, 1.5vmin, 32px);
 }
 
+/* Kiosk: disable context menu and touch callouts globally */
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 body {
   background-color: #FCFCFC;
   color: var(--color-text-black);
@@ -32,6 +39,15 @@ body {
   pointer-events: none;
   z-index: 0;
   background: #fcfcfc;
+}
+
+/* Blue border halo — remove .nb-halo class to disable */
+.nb-halo {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  box-shadow: inset 0 0 140px 30px rgba(113, 131, 245, 0.28);
 }
 
 .nb-blob {
