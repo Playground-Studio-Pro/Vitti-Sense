@@ -12,4 +12,5 @@ extra info
 *.pdf
 *.jpeg
 *.jpg
+!public/Qr.jpeg
 ~$*
